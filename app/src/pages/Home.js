@@ -1,45 +1,67 @@
-import { Link } from 'react-router-dom';
-
-//This is for mock data products
-// import { products } from './products'; 
-
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-
 function Home() {
-  const[products, setProduct] = useState([]);
-
-  //Filtering state
+  const [products, setProduct] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  //Fetching data from the API
-  useEffect(()=>{
-    const fetchProducts = async () =>{
-      try{
+  
+  // 1. Read the search term from the URL (sent by the Navbar)
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('search') || ''; // Defaults to empty string if no search
+
+  // Fetching data from the API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
         const response = await fetch('http://localhost:5000/api/allproducts');
-        const products = await response.json();
-        setProduct(products);
-        console.log(products);
-      }catch(error){
+        const data = await response.json();
+        setProduct(data);
+        console.log(data);
+      } catch(error) {
         console.log("Failed to fetch products:", error);
       }
     };
     fetchProducts();
   }, []);
-  
 
-  //Getting the unique categories
+  // Getting the unique categories
   const uniqueCategories = ['All', ...new Set(products.map(product => product.category))];
-  //Filtering the products 
-  const filteredProducts = selectedCategory === 'All' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
-  return (
-    // 2. Use className instead of style
-    <div className="page-container">
-      <h1 className="header">Our Products</h1>
-      
+  
+  // 2. Filter the products by BOTH category and search query
+  const filteredProducts = products.filter((product) => {
+    // Does it match the category? (True if 'All' is selected, OR if the category matches)
+    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+    
+    // Does it match the search? (True if search is empty, OR if name contains the typed letters)
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Only keep the product if BOTH are true
+    return matchesCategory && matchesSearch;
+  });
 
-    {/* 4. Display the filter buttons */}
+  //Automatically scroll to the container when a search query is submitted
+  useEffect(() => {
+    if (searchQuery) {
+      const container = document.getElementById('page-container');
+      if (container) {
+        container.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [searchQuery]);
+
+  return (
+    <div className="page-container" id="page-container">
+      
+      {/* 3. Optional: Show what they searched for and a "Clear" button */}
+      {searchQuery && (
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <h6>Search results for: "{searchQuery}"</h6>
+          <Link to="/" style={{ color: '#007bff', textDecoration: 'underline' }}>Clear Search</Link>
+        </div>
+      )}
+
+      {/* Display the filter buttons */}
       <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginBottom: '40px', flexWrap: 'wrap' }}>
         {uniqueCategories.map(category => (
           <button 
@@ -53,7 +75,6 @@ function Home() {
               fontWeight: 'bold',
               fontSize: '10px',
               transition: 'all 0.2s ease',
-              // Highlight the button if it's the currently selected one
               backgroundColor: selectedCategory === category ? '#000' : '#fff',
               color: selectedCategory === category ? '#fff' : '#000',
             }}
@@ -68,8 +89,6 @@ function Home() {
           <div key={product.id} className="card">
             
            <img 
-              // Checks if it starts with 'http'. 
-              // The '?.' prevents crashes if product.image is ever undefined while loading.
               src={
                 product.image?.startsWith('http') 
                   ? product.image 
@@ -81,7 +100,7 @@ function Home() {
             
             <div className="card-content">
               <h3 className="product-title">{product.name}</h3>
-              <p className="product-price">${product.price.toFixed(2)}</p>
+              <p className="product-price">₹{Number(product.price).toFixed(2)}</p>
               
               <Link to={`/product/${product.id}`} className="link">
                 <button className="button">View Details</button>
@@ -91,6 +110,14 @@ function Home() {
           </div>
         ))}
       </div>
+
+      {/* Show a message if no products match the search or category */}
+      {filteredProducts.length === 0 && (
+        <h4 style={{ textAlign: 'center', width: '100%', color: '#666' }}>
+          No products found.
+        </h4>
+      )}
+
     </div>
   );
 }

@@ -1,0 +1,37 @@
+/* Navbar.css */
+
+.glass-navbar {
+  /* A very sheer white tint (adjust the 0.1 to make it darker or lighter) */
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  max-width: 1000px;
+  margin: 30px auto;
+  
+  /* The magic blur effect */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Required for Safari browsers */
+  
+  /* A subtle border to give the "glass" a defined edge */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* Optional: A soft shadow to separate it from the water */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 40px;
+}
+
+/* Optional: Make the search input look like glass too! */
+.glass-navbar .form-control {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.glass-navbar .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.glass-navbar .form-control:focus {
+ background-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  border-color: white;
+  color: white;
+}

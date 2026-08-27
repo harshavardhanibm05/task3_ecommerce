@@ -1,0 +1,56 @@
+/* Banner.css */
+
+.banner-wrapper {
+  margin: 0px auto;
+  max-width: 1300px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border-radius: 12px;
+}
+
+/* NEW: Layout container to manage Navbar and Content */
+.banner-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.banner-content {
+  /* Changed to flex: 1 so it fills the space below the navbar */
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+}
+
+.banner-content h1 {
+  font-size: 3rem;
+  margin: 0 0 10px 0;
+}
+
+.banner-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.banner-btn {
+  padding: 12px 24px;
+  background-color: white;
+  color: #333;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none; /* Added to fix <a> tag styling */
+  transition: transform 0.2s ease;
+}
+
+.banner-btn:hover {
+  transform: scale(1.05);
+  text-decoration: none;
+  color: #333;
+}

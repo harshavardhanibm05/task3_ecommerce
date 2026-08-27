@@ -46,7 +46,7 @@ function ProductDetails() {
         <div className="details-info">
           <span className="category-badge">{product.category}</span>
           <h1 className="details-title">{product.name}</h1>
-          <h2 className="details-price">${product.price.toFixed(2)}</h2>
+          <h2 className="details-price">₹{product.price.toFixed(2)}</h2>
           <p className="details-description">{product.description}</p>
           
           <button className="add-to-cart-btn">Add to Cart</button>
