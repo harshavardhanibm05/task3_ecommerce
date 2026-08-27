@@ -1,7 +1,8 @@
-import './css/Footer.css'; // Import the new styles
+import './css/Footer.css'; // Make sure Footer.css exists in this folder!
+// FIXED: Changed FaponeAlt to FaPhoneAlt
+import { FaLinkedin, FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
 
 function Footer() {
-  // Automatically grabs the current year so it never goes out of date
   const currentYear = new Date().getFullYear();
 
   return (
@@ -16,11 +17,19 @@ function Footer() {
           </p>
         </div>
         
-        {/* Right Side: Links */}
+        {/* Right Side: Links with Icons */}
         <div className="footer-links">
-          <a target="_blank" href="https://www.linkedin.com/in/harshavardhan05" className="footer-link">LinkedIn</a>
-          {/* <a href="#" className="footer-link">Twitter</a>
-          <a href="#" className="footer-link">Support</a> */}
+          <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/harshavardhan05" className="footer-link">
+            <FaLinkedin style={{ marginRight: '6px' }} /> LinkedIn
+          </a>
+          
+          <a target="_blank" rel="noopener noreferrer" href="https://wa.me/yourphonenumber" className="footer-link">
+            <FaWhatsapp style={{ marginRight: '6px' }} /> WhatsApp
+          </a>
+          
+          <a href="tel:+1234567890" className="footer-link">
+            <FaPhoneAlt style={{ marginRight: '6px' }} /> Call Us
+          </a>
         </div>
 
       </div>
