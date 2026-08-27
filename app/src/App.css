@@ -1,0 +1,194 @@
+/* Home.css */
+
+.page-container {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out; /* Added a neat hover animation! */
+}
+
+/* Makes the card lift up slightly when you hover over it */
+.card:hover {
+  transform: translateY(-5px); 
+}
+
+.product-image {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+}
+
+.card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.product-title {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+}
+
+.product-price {
+  margin: 0 0 20px 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #666;
+}
+
+.link {
+  text-decoration: none;
+  margin-top: auto;
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #333;
+}
+
+
+/* //Product details */
+/* ProductDetails.css */
+
+.details-page {
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 30px;
+  color: #666;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #000;
+}
+
+/* Flexbox creates the two-column layout */
+.details-container {
+  display: flex;
+  gap: 50px;
+  align-items: flex-start;
+}
+
+.details-image-wrapper {
+  flex: 1; /* Takes up 50% of the space */
+}
+
+.details-image {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  object-fit: cover;
+}
+
+.details-info {
+  flex: 1; /* Takes up the other 50% */
+  display: flex;
+  flex-direction: column;
+}
+
+.category-badge {
+  background-color: #f0f0f0;
+  color: #666;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+  margin-bottom: 15px;
+}
+
+.details-title {
+  margin: 0 0 15px 0;
+  font-size: 2.5rem;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.details-price {
+  margin: 0 0 25px 0;
+  font-size: 2rem;
+  color: #000;
+  font-weight: 700;
+}
+
+.details-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 40px;
+}
+
+.add-to-cart-btn {
+  padding: 16px 32px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #333;
+}
+
+/* Adds a satisfying 'click' shrink effect */
+.add-to-cart-btn:active {
+  transform: scale(0.98); 
+}
+
+/* Mobile Design: Stacks the columns on small screens */
+@media (max-width: 768px) {
+  .details-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
