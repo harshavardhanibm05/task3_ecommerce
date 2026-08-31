@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import Footer from "./components/Footer";
 import ProductDetails from "./components/ProductDetails";
 import Banner from './components/Banner';
-import Navbar from "./components/Navbar";
+// import Navbar from "./components/Navbar";
 import AddProduct from "./admin/AdminPortal";
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
       {/* 3. Your page routes go here */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/product/:source/:id" element={<ProductDetails />} />
         <Route path="/addproduct" element={<AddProduct />} />
       </Routes>
       

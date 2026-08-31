@@ -1,42 +1,54 @@
-import React from 'react';
-import WaterWave from 'react-water-wave';
-import Navbar from './Navbar'; // 1. Import your Navbar here
+import React, { useEffect, useRef } from 'react';
+import Navbar from './Navbar'; 
 import './css/Banner.css'; 
 
+// 1. Only import jQuery at the top
+import $ from 'jquery';
+
 function Banner() {
+  const bannerRef = useRef(null);
+
+  useEffect(() => {
+    // 2. Bind jQuery to the global window object
+    window.$ = window.jQuery = $;
+    
+    // 3. Require the ripples plugin AFTER jQuery is bound
+    require('jquery.ripples');
+
+    if (bannerRef.current) {
+      $(bannerRef.current).ripples({
+        resolution: 512,
+        dropRadius: 20,
+        perturbance: 0.04,
+        interactive: true
+      });
+    }
+
+    return () => {
+      if (bannerRef.current) {
+        // Safe cleanup check
+        try {
+          $(bannerRef.current).ripples('destroy');
+        } catch (e) {
+          // Ignore cleanup errors on unmount
+        }
+      }
+    };
+  }, []);
+
   return (
     <div className="banner-wrapper">
-      <WaterWave
-        imageUrl="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop"
-        dropRadius={20}
-        perturbance={0.03}
-        resolution={512}
-        style={{ 
-          width: '100%', 
-          height: '500px', 
-          backgroundSize: 'cover', 
-          backgroundPosition: 'center',
-          borderRadius: '12px',
-          overflow: 'hidden'
-        }}
-      >
-        {() => (
-          // 2. Wrap everything in a layout container
-          <div className="banner-layout">
-            
-            {/* 3. Place the Navbar at the very top */}
-            <Navbar />
-            
-            {/* 4. Keep your content centered below it */}
-            <div className="banner-content">
-              <h1>Next-Gen Tech, Delivered to Your Door!</h1>
-              <p>Click. Shop. Smile.</p>
-              <a href="#page-container" className="banner-btn">Shop Now</a>
-            </div>
-            
+      <div ref={bannerRef} className="banner-background">
+        <div className="banner-layout">
+          <Navbar />
+          
+          <div className="banner-content">
+            <h1>Next-Gen Tech, Delivered to Your Door!</h1>
+            <p>Click. Shop. Smile.</p>
+            <a href="#page-container" className="banner-btn">Shop Now</a>
           </div>
-        )}
-      </WaterWave>
+        </div>
+      </div>
     </div>
   );
 }

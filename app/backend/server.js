@@ -5,40 +5,42 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Allows server to read JSON data
+app.use(express.json());
 
 // Create "uploads" folder automatically if it doesn't exist
 if (!fs.existsSync('./uploads')) {
   fs.mkdirSync('./uploads');
 }
 
-// Make the "uploads" folder publicly accessible 
-// so React can display images using http://localhost:5000/uploads/filename.jpg
+// Make the "uploads" folder publicly accessible
 app.use('/uploads', express.static('uploads'));
 
 // Configure Multer for file storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Save files to the uploads folder
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    // Give the file a unique name using the current timestamp + original extension
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-// We expect the file to be sent in a field named 'imageFile'
-const upload = multer({ storage: storage });
+// Increase field size limit to 5 MB to handle large JSON in reviews / tags fields
+const upload = multer({
+  storage: storage,
+  limits: { fieldSize: 5 * 1024 * 1024 }
+});
 
 // Connect to Database
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '', 
-  database: 'ecom'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 db.connect((err) => {
@@ -47,45 +49,89 @@ db.connect((err) => {
 });
 
 
-//API for get the products 
+// GET all products
 app.get('/api/allproducts', (req, res) => {
   const sql = 'SELECT * FROM products';
-  
   db.query(sql, (err, results) => {
-  
     if (err) {
       console.error(err);
       return res.status(500).json({ error: "Database error occurred" });
     }
-    
     res.status(200).json(results);
   });
 });
 
-// Update the API Endpoint to use upload.single()
-app.post('/api/products', upload.single('imageFile'), (req, res) => {
-  const { name, price, description, category } = req.body;
-  
-  // Determine which image path/URL to save
-  let imageToSave = req.body.image; // Default to the URL string if provided
+// GET single product by ID
+app.get('/api/products/:id', (req, res) => {
+  const sql = 'SELECT * FROM products WHERE id = ?';
+  db.query(sql, [req.params.id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Database error occurred" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.status(200).json(results[0]);
+  });
+});
 
+// Helper: convert empty string / undefined to null (prevents MySQL strict-mode errors on numeric columns)
+const toNull = (v) => (v === '' || v === undefined || v === null) ? null : v;
+const toNum  = (v) => (v === '' || v === undefined || v === null) ? null : Number(v);
+
+// Helper: ensure a value stored as JSON text is always a valid JSON string or null.
+// Accepts a JSON string, a plain object/array (already parsed), or null.
+const toJsonText = (v) => {
+  if (v === '' || v === undefined || v === null) return null;
+  // Already a plain JS object/array — stringify it
+  if (typeof v === 'object') return JSON.stringify(v);
+  // Already a string — validate it is valid JSON, else wrap as JSON array of strings
+  try {
+    JSON.parse(v);
+    return v; // valid JSON string, keep as-is
+  } catch {
+    // Plain comma-separated text (e.g. tags) — store as-is, it's longtext
+    return v;
+  }
+};
+
+// POST — add a new product (all fields)
+app.post('/api/products', upload.single('imageFile'), (req, res) => {
+  const {
+    title, price, description, category,
+    discountPercentage, rating, stock, tags,
+    brand, sku, weight, dimensions,
+    warrantyInformation, shippingInformation, availabilityStatus,
+    reviews, returnPolicy, minimumOrderQuantity, meta, thumbnail
+  } = req.body;
+
+  let imagesToSave = toNull(req.body.images);
   if (req.file) {
-    // If a file was uploaded, construct the local URL path instead
-    imageToSave = `uploads/${req.file.filename}`;
+    imagesToSave = `uploads/${req.file.filename}`;
   }
 
-  const sql = "INSERT INTO products (name, price, description, category, image) VALUES (?, ?, ?, ?, ?)";
-  const values = [name, price, description, category, imageToSave];
+  const sql = 'INSERT INTO products (title, price, description, category, images, thumbnail, discountPercentage, rating, stock, tags, brand, sku, weight, dimensions, warrantyInformation, shippingInformation, availabilityStatus, reviews, returnPolicy, minimumOrderQuantity, meta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+  const values = [
+    toNull(title), toNum(price), toNull(description), toNull(category),
+    imagesToSave, toNull(thumbnail),
+    toNum(discountPercentage), toNum(rating), toNum(stock),
+    toJsonText(tags), toNull(brand), toNull(sku), toNum(weight),
+    toNull(dimensions), toNull(warrantyInformation),
+    toNull(shippingInformation), toNull(availabilityStatus),
+    toJsonText(reviews), toNull(returnPolicy),
+    toNum(minimumOrderQuantity), toNull(meta)
+  ];
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Failed to add product" });
+      console.error('INSERT error:', err.sqlMessage || err.message);
+      return res.status(500).json({ error: err.sqlMessage || "Failed to add product" });
     }
     res.status(201).json({ message: "Product added!", id: result.insertId });
   });
 });
-
 
 // DELETE a product by ID
 app.delete('/api/products/:id', (req, res) => {
@@ -99,28 +145,45 @@ app.delete('/api/products/:id', (req, res) => {
   });
 });
 
-// UPDATE a product by ID (Needs upload.single to handle potential new files!)
+// PUT — update a product by ID (all fields)
 app.put('/api/products/:id', upload.single('imageFile'), (req, res) => {
-  const { name, price, description, category } = req.body;
   const id = req.params.id;
-  
-  // If they uploaded a new file, construct the new path. Otherwise, keep the old string.
-  let imageToSave = req.body.image; 
+  const {
+    title, price, description, category,
+    discountPercentage, rating, stock, tags,
+    brand, sku, weight, dimensions,
+    warrantyInformation, shippingInformation, availabilityStatus,
+    reviews, returnPolicy, minimumOrderQuantity, meta, thumbnail
+  } = req.body;
+
+  let imagesToSave = toNull(req.body.images);
   if (req.file) {
-    imageToSave = `http://localhost:5000/uploads/${req.file.filename}`;
+    imagesToSave = `uploads/${req.file.filename}`;
   }
 
-  const sql = "UPDATE products SET name = ?, price = ?, description = ?, category = ?, image = ? WHERE id = ?";
-  const values = [name, price, description, category, imageToSave, id];
+  const sql = 'UPDATE products SET title = ?, price = ?, description = ?, category = ?, images = ?, thumbnail = ?, discountPercentage = ?, rating = ?, stock = ?, tags = ?, brand = ?, sku = ?, weight = ?, dimensions = ?, warrantyInformation = ?, shippingInformation = ?, availabilityStatus = ?, reviews = ?, returnPolicy = ?, minimumOrderQuantity = ?, meta = ? WHERE id = ?';
+
+  const values = [
+    toNull(title), toNum(price), toNull(description), toNull(category),
+    imagesToSave, toNull(thumbnail),
+    toNum(discountPercentage), toNum(rating), toNum(stock),
+    toJsonText(tags), toNull(brand), toNull(sku), toNum(weight),
+    toNull(dimensions), toNull(warrantyInformation),
+    toNull(shippingInformation), toNull(availabilityStatus),
+    toJsonText(reviews), toNull(returnPolicy),
+    toNum(minimumOrderQuantity), toNull(meta),
+    id
+  ];
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Failed to update product" });
+      console.error('UPDATE error:', err.sqlMessage || err.message);
+      return res.status(500).json({ error: err.sqlMessage || "Failed to update product" });
     }
     res.status(200).json({ message: "Product updated successfully" });
   });
 });
-app.listen(5000, () => {
-  console.log('Backend server running on http://localhost:5000');
+
+app.listen(5000, '127.0.0.1', () => {
+  console.log('Backend server running on http://127.0.0.1:5000');
 });
