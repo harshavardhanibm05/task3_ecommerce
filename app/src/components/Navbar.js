@@ -1,19 +1,27 @@
-import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom'; // 1. Import useLocation
-import './css/Navbar.css'; 
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import './css/Navbar.css';
+import cartLogo from '../assets/shopping-cart.png';
+import { useCart } from '../context/CartContext';
 
 function Navbar() {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  
-  // 2. Get the current URL path (e.g., "/", "/about", "/contact")
   const location = useLocation();
   const currentPath = location.pathname;
 
+  // Use shared cart state from context
+  const { cartItems, fetchCartItems } = useCart();
+
   const handleSearch = (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     navigate(`/?search=${searchTerm}#page-container`);
   };
+
+  // Load cart items on mount
+  useEffect(() => {
+    fetchCartItems();
+  }, [fetchCartItems]);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark w-100 glass-navbar">
@@ -71,7 +79,19 @@ function Navbar() {
           </li>
 
         </ul>
-        
+        {/* Cart icon — links to /cart, badge highlights when active */}
+        <Link
+          to="/cart"
+          className={`nav-cart-link position-relative my-2 my-sm-0 ${currentPath === '/cart' ? 'nav-cart-active' : ''}`}
+          aria-label={`Cart, ${cartItems.length} items`}
+        >
+          <img src={cartLogo} alt="Cart" width={28} height={28} className="nav-cart-icon" />
+          {cartItems.length > 0 && (
+            <span className="nav-cart-badge">
+              {cartItems.length > 99 ? '99+' : cartItems.length}
+            </span>
+          )}
+        </Link>
         <form className="form-inline my-2 my-lg-0" onSubmit={handleSearch}>
           <input 
             className="form-control mr-sm-2" 

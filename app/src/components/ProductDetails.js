@@ -1,11 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useCart } from '../context/CartContext';
 
 function ProductDetails() {
   const { source, id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [cartMsg, setCartMsg] = useState('');
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -45,6 +48,30 @@ function ProductDetails() {
       </div>
     );
   }
+
+  // Add to cart — works for both local and external products
+  const cartAddHandle = async () => {
+    try {
+      // Determine the display price (after discount if applicable)
+      const price = Number(product.price) || 0;
+      const discount = product.discountPercentage ? Number(product.discountPercentage) : 0;
+      const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
+
+      await addToCart({
+        product_id: product.id,
+        source: source,                              // 'local' or 'external' from URL params
+        product_name: product.title || product.name || 'Product',
+        product_price: parseFloat(finalPrice.toFixed(2))
+      });
+
+      setCartMsg('✓ Added to cart!');
+      setTimeout(() => setCartMsg(''), 3000);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      setCartMsg(`✗ ${error.message}`);
+      setTimeout(() => setCartMsg(''), 3000);
+    }
+  };
 
   // --- Normalize fields across both sources ---
   const displayName  = product.title  || product.name  || 'Product';
@@ -167,7 +194,12 @@ function ProductDetails() {
             </div>
           )}
 
-          <button className="add-to-cart-btn">Add to Cart</button>
+          <button className="add-to-cart-btn" onClick={cartAddHandle}>Add to Cart</button>
+          {cartMsg && (
+            <p style={{ marginTop: '8px', fontWeight: 'bold', color: cartMsg.startsWith('✓') ? 'green' : 'red' }}>
+              {cartMsg}
+            </p>
+          )}
         </div>
       </div>
 

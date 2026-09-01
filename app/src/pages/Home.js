@@ -1,10 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useCart } from '../context/CartContext';
 // require('dotenv').config();
 
 function Home() {
   const [products, setProduct] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  // cardMsgs: Map of "source-id" -> { text, ok }
+  const [cardMsgs, setCardMsgs] = useState({});
+  const { addToCart } = useCart();
   const LOCALHOST_API = process.env.REACT_APP_LOCALHOST_API;
   const EXTERNAL_API = process.env.REACT_APP_EXTERNAL_API;
   // console.log("Local API", LOCALHOST_API);
@@ -45,6 +49,28 @@ function Home() {
     };
     fetchProducts();
   }, []);
+
+  const handleAddToCart = useCallback(async (product) => {
+    const key = `${product.source}-${product.id}`;
+    const price    = Number(product.price) || 0;
+    const discount = Number(product.discountPercentage) || 0;
+    const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
+
+    setCardMsgs(prev => ({ ...prev, [key]: { text: 'Adding…', ok: true } }));
+    try {
+      await addToCart({
+        product_id:    product.id,
+        source:        product.source,
+        product_name:  product.title || product.name || 'Product',
+        product_price: parseFloat(finalPrice.toFixed(2))
+      });
+      setCardMsgs(prev => ({ ...prev, [key]: { text: '✓ Added!', ok: true } }));
+    } catch (err) {
+      setCardMsgs(prev => ({ ...prev, [key]: { text: '✗ Failed', ok: false } }));
+    }
+    setTimeout(() => setCardMsgs(prev => { const n = { ...prev }; delete n[key]; return n; }), 2500);
+  }, [addToCart]);
+
   // Getting the unique categories
   const uniqueCategories = ['All', ...new Set(products.map(product => product.category).filter(Boolean))];
   
@@ -176,9 +202,24 @@ function Home() {
                   </p>
                 )}
 
-                <Link to={detailPath} className="link">
-                  <button className="button">View Details</button>
+                <div className="card-actions-row">
+                <Link to={detailPath} className="link details-link-wrapper">
+                  <button className="button full-width-btn">View Details</button>
                 </Link>
+                
+                <button
+                  className="card-add-cart-btn cart-30-btn"
+                  onClick={() => handleAddToCart(product)}
+                  disabled={cardMsgs[`${product.source}-${product.id}`]?.text === 'Adding…'}
+                >
+                  🛒 
+                </button>
+              </div>
+                {cardMsgs[`${product.source}-${product.id}`] && (
+                  <p className={`card-cart-msg ${cardMsgs[`${product.source}-${product.id}`].ok ? 'card-cart-msg-ok' : 'card-cart-msg-err'}`}>
+                    {cardMsgs[`${product.source}-${product.id}`].text}
+                  </p>
+                )}
               </div>
             </div>
           );

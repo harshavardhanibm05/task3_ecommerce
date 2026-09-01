@@ -30,8 +30,74 @@
 }
 
 .glass-navbar .form-control:focus {
- background-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.35);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   border-color: white;
   color: white;
+}
+
+/* ── Cart icon link ── */
+.nav-cart-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 6px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  margin-right: 10px;
+}
+
+.nav-cart-link:hover {
+  background: rgba(241, 94, 20, 0.18);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+/* Active state — when the user is on /cart */
+.nav-cart-active {
+  background: rgba(241, 94, 20, 0.22) !important;
+}
+
+.nav-cart-active .nav-cart-icon {
+  filter: drop-shadow(0 0 4px rgba(241, 94, 20, 0.8));
+}
+
+.nav-cart-icon {
+  display: block;
+  transition: transform 0.15s;
+  filter: brightness(0) invert(1); /* Makes the icon white to match navbar text */
+}
+
+.nav-cart-link:hover .nav-cart-icon {
+  transform: scale(1.08);
+}
+
+/* Badge */
+.nav-cart-badge {
+  position: absolute;
+  top: 0px;
+  right: 2px;
+  background: #f15e14;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(241, 94, 20, 0.5);
+  animation: badge-pop 0.25s ease;
+}
+
+@keyframes badge-pop {
+  0%   { transform: scale(0.5); }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }

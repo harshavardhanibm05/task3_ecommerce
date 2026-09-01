@@ -424,3 +424,62 @@
 
 .card-stock-in  { color: #16a34a; }
 .card-stock-out { color: #dc2626; }
+/* ── Home card: Add to Cart button ── */
+.card-add-cart-btn {
+  width: 100%;
+  padding: 10px;
+  background: #f15e14;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  /* margin-top: 6px; */
+}
+
+.card-add-cart-btn:hover {
+  background: #d44e0e;
+}
+
+.card-add-cart-btn:active {
+  transform: scale(0.97);
+}
+
+.card-add-cart-btn:disabled {
+  background: #aaa;
+  cursor: default;
+}
+
+/* ── Home card: added-to-cart inline feedback ── */
+.card-cart-msg {
+  font-size: 11px;
+  font-weight: 700;
+  margin: 5px 0 0 0;
+  text-align: center;
+}
+.card-cart-msg-ok  { color: #16a34a; }
+.card-cart-msg-err { color: #dc2626; }
+.card-actions-row {
+  display: flex;
+  gap: 8px; /* Creates a small, clean space between the buttons */
+  width: 100%;
+}
+
+.details-link-wrapper {
+  flex: 7; /* Takes up 7 parts (70%) of the row */
+  text-decoration: none; 
+}
+
+.full-width-btn {
+  width: 100%; /* Forces the button to stretch across the entire 70% wrapper */
+  height: 100%; /* Ensures it matches the height of the cart button */
+}
+
+.cart-30-btn {
+  flex: 3; /* Takes up 3 parts (30%) of the row */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,59 @@
+/* Footer.css */
+
+.footer-container {
+  background-color: #111; /* A sleek, dark almost-black */
+  color: #fff;
+  padding: 40px 20px;
+  margin-top: 60px; /* Pushes the footer down from your page content */
+  font-family: system-ui, -apple-system, sans-serif;
+  border-top: 4px solid #333;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Allows wrapping on small screens */
+  gap: 20px;
+}
+
+.footer-brand {
+  margin: 0 0 8px 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.footer-copyright {
+  margin: 0;
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center; /* Centers the icon vertically with the text */
+  color: #ccc;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #fff;
+  transform: translateY(-2px);
+}
+/* Mobile Design: Stacks the columns on small screens */
+@media (max-width: 600px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}
