@@ -255,15 +255,15 @@ app.put('/api/products/:id', upload.single('imageFile'), (req, res) => {
 
 // POST — add a product to cart (requires auth)
 app.post('/api/add/cart', authenticateToken, (req, res) => {
-  const { product_id, source, product_name, product_price } = req.body;
+  const { product_id, source, product_name, product_price, product_image } = req.body;
   const user_id = req.user.id;
 
   if (!product_id || !source) {
     return res.status(400).json({ error: "product_id and source are required" });
   }
 
-  const sql = 'INSERT INTO cart_items (user_id, product_id, source, product_name, product_price) VALUES (?, ?, ?, ?, ?)';
-  db.query(sql, [user_id, product_id, source, product_name || null, product_price || null], (err, result) => {
+  const sql = 'INSERT INTO cart_items (user_id, product_id, source, product_name,product_images, product_price) VALUES (?, ?, ?, ?, ?, ?)';
+  db.query(sql, [user_id, product_id, source, product_name || null, product_image || null, product_price || null], (err, result) => {
     if (err) {
       console.error('INSERT error:', err.sqlMessage || err.message);
       return res.status(500).json({ error: err.sqlMessage || "Failed to add product" });
@@ -283,6 +283,7 @@ app.get('/api/cart/items', authenticateToken, (req, res) => {
       ci.added_date,
       COALESCE(p.title, ci.product_name) AS product_name,
       COALESCE(p.price, ci.product_price) AS product_price,
+      ci.product_images as et_product_image,
       p.images AS product_images,
       p.thumbnail AS product_thumbnail
     FROM cart_items ci

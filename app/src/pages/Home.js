@@ -50,19 +50,31 @@ function Home() {
     fetchProducts();
   }, []);
 
+  console.log("All products:", products);
+
   const handleAddToCart = useCallback(async (product) => {
     const key = `${product.source}-${product.id}`;
     const price    = Number(product.price) || 0;
     const discount = Number(product.discountPercentage) || 0;
     const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
 
+    // Extract the image specifically for the cart payload
+    const rawImage = Array.isArray(product.images)
+      ? product.images[0]
+      : (product.images || product.image || product.thumbnail || '');
+    
+    const imageSrc = rawImage.startsWith('http')
+      ? rawImage
+      : (rawImage ? `http://localhost:5000/${rawImage}` : '');
+      
     setCardMsgs(prev => ({ ...prev, [key]: { text: 'Adding…', ok: true } }));
     try {
       await addToCart({
         product_id:    product.id,
         source:        product.source,
         product_name:  product.title || product.name || 'Product',
-        product_price: parseFloat(finalPrice.toFixed(2))
+        product_price: parseFloat(finalPrice.toFixed(2)),
+        product_image: imageSrc
       });
       setCardMsgs(prev => ({ ...prev, [key]: { text: '✓ Added!', ok: true } }));
     } catch (err) {

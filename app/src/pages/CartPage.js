@@ -14,7 +14,7 @@ function CartPage() {
   const [couponMsg, setCouponMsg] = useState('');
   const [discount, setDiscount]   = useState(0);
   const navigate = useNavigate();
-
+  console.log("Cart Items", cartItems);
   // Fetch on mount in case user navigated directly
   useEffect(() => {
     fetchCartItems();
@@ -53,6 +53,7 @@ function CartPage() {
   const taxAmount     = afterCoupon * TAX_RATE;
   const grandTotal    = afterCoupon + shippingFee + taxAmount;
 
+ 
   // ── Empty state ──
   if (cartItems.length === 0) {
     return (
@@ -66,6 +67,7 @@ function CartPage() {
       </div>
     );
   }
+
 
   return (
     <div className="cart-page">
@@ -85,9 +87,10 @@ function CartPage() {
             const rawImg   = item.product_images
               ? (Array.isArray(item.product_images) ? item.product_images[0] : item.product_images)
               : (item.product_thumbnail || '');
-            const imgSrc   = rawImg && rawImg.startsWith('http')
-              ? rawImg
-              : rawImg ? `http://localhost:5000/${rawImg}` : null;
+            // const imgSrc   = rawImg && rawImg.startsWith('http')
+            //   ? rawImg
+            //   : rawImg ? `http://localhost:5000/${rawImg}` : null;
+            const imgSrc = item.et_product_image;
 
             const isRemoving = removing === item.id;
 

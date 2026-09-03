@@ -37,7 +37,7 @@ export function CartProvider({ children }) {
     }
   }, []);
 
-  const addToCart = useCallback(async ({ product_id, source, product_name, product_price }) => {
+  const addToCart = useCallback(async ({ product_id, source, product_name, product_price, product_image }) => {
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('LOGIN_REQUIRED');
@@ -45,7 +45,7 @@ export function CartProvider({ children }) {
     const response = await fetch('http://localhost:5000/api/add/cart', {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ product_id, source, product_name, product_price })
+      body: JSON.stringify({ product_id, source, product_name, product_price, product_image })
     });
     const data = await response.json();
     if (!response.ok) {
