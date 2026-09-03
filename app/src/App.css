@@ -483,3 +483,132 @@
   align-items: center;
   justify-content: center;
 }
+
+/* AUTHENTICATION STYLE */
+/* Center the card on the page */
+.auth-page-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+/* The main form container */
+.auth-card {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.auth-title {
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Input fields */
+.auth-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.auth-input:focus {
+  border-color: #0056b3; /* Matches your IBM blue */
+  outline: none;
+}
+
+/* Side-by-side fields for names */
+.auth-row {
+  display: flex;
+  gap: 15px;
+}
+
+/* Primary Action Button */
+.auth-submit-btn {
+  background-color: #0056b3; /* IBM Blue */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.auth-submit-btn:hover {
+  background-color: #004494;
+}
+
+/* Divider */
+.auth-divider {
+  margin: 25px 0;
+  display: flex;
+  align-items: center;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #eee;
+}
+
+.auth-divider span {
+  padding: 0 10px;
+}
+
+/* Secondary Toggle Button */
+.auth-toggle-btn {
+  background: transparent;
+  color: #f26522; /* Matches your active navbar orange */
+  border: 1px solid #f26522;
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-toggle-btn:hover {
+  background-color: rgba(242, 101, 34, 0.05);
+}
+.auth-back-container {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.auth-back-link {
+  text-decoration: none;
+  color: #0056b3; /* Matches your IBM blue */
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.auth-back-link:hover {
+  color: #f26522; /* Matches your orange highlight */
+  text-decoration: none;
+}

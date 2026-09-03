@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Cart.css';
 
@@ -9,10 +9,11 @@ const TAX_RATE           = 0.18;  // 18% GST
 
 function CartPage() {
   const { cartItems, fetchCartItems, removeFromCart } = useCart();
-  const [removing, setRemoving] = useState(null); // tracks which item is being removed
+  const [removing, setRemoving] = useState(null);
   const [coupon, setCoupon]     = useState('');
   const [couponMsg, setCouponMsg] = useState('');
   const [discount, setDiscount]   = useState(0);
+  const navigate = useNavigate();
 
   // Fetch on mount in case user navigated directly
   useEffect(() => {
@@ -182,8 +183,19 @@ function CartPage() {
               </p>
             )}
 
-            {/* Checkout placeholder */}
-            <button className="cart-checkout-btn" onClick={() => alert('Payment gateway coming soon!')}>
+            <button
+              className="cart-checkout-btn"
+              onClick={() => {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                  navigate('/auth', { state: { from: '/checkout' } });
+                } else {
+                  navigate('/checkout', {
+                    state: { subtotal, discount, couponSaving, shippingFee, taxAmount, grandTotal }
+                  });
+                }
+              }}
+            >
               Proceed to Checkout
             </button>
 

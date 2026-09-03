@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { useCart } from '../context/CartContext';
 // require('dotenv').config();
@@ -6,9 +6,9 @@ import { useCart } from '../context/CartContext';
 function Home() {
   const [products, setProduct] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  // cardMsgs: Map of "source-id" -> { text, ok }
   const [cardMsgs, setCardMsgs] = useState({});
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const LOCALHOST_API = process.env.REACT_APP_LOCALHOST_API;
   const EXTERNAL_API = process.env.REACT_APP_EXTERNAL_API;
   // console.log("Local API", LOCALHOST_API);
@@ -66,6 +66,10 @@ function Home() {
       });
       setCardMsgs(prev => ({ ...prev, [key]: { text: '✓ Added!', ok: true } }));
     } catch (err) {
+      if (err.message === 'LOGIN_REQUIRED') {
+        navigate('/auth', { state: { from: '/' } });
+        return;
+      }
       setCardMsgs(prev => ({ ...prev, [key]: { text: '✗ Failed', ok: false } }));
     }
     setTimeout(() => setCardMsgs(prev => { const n = { ...prev }; delete n[key]; return n; }), 2500);

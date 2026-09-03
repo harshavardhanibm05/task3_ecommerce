@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 
@@ -9,6 +9,7 @@ function ProductDetails() {
   const [activeImage, setActiveImage] = useState(0);
   const [cartMsg, setCartMsg] = useState('');
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -67,6 +68,10 @@ function ProductDetails() {
       setCartMsg('✓ Added to cart!');
       setTimeout(() => setCartMsg(''), 3000);
     } catch (error) {
+      if (error.message === 'LOGIN_REQUIRED') {
+        navigate('/auth', { state: { from: `/product/${source}/${id}` } });
+        return;
+      }
       console.error("Error adding to cart:", error);
       setCartMsg(`✗ ${error.message}`);
       setTimeout(() => setCartMsg(''), 3000);

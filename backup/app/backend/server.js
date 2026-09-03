@@ -184,6 +184,64 @@ app.put('/api/products/:id', upload.single('imageFile'), (req, res) => {
   });
 });
 
+// POST — add a product to cart (works for both local and external products)
+app.post('/api/add/cart', (req, res) => {
+  const { product_id, source, product_name, product_price } = req.body;
+
+  if (!product_id || !source) {
+    return res.status(400).json({ error: "product_id and source are required" });
+  }
+
+  const sql = 'INSERT INTO cart_items (product_id, source, product_name, product_price) VALUES (?, ?, ?, ?)';
+  db.query(sql, [product_id, source, product_name || null, product_price || null], (err, result) => {
+    if (err) {
+      console.error('INSERT error:', err.sqlMessage || err.message);
+      return res.status(500).json({ error: err.sqlMessage || "Failed to add product" });
+    }
+    res.status(201).json({ message: "Product added to cart!", id: result.insertId });
+  });
+});
+
+// GET — all cart items enriched with product details
+app.get('/api/cart/items', (req, res) => {
+  // Fetch all cart rows first, then enrich local ones via JOIN
+  const sql = `
+    SELECT
+      ci.id,
+      ci.product_id,
+      ci.source,
+      ci.added_date,
+      COALESCE(p.title, ci.product_name) AS product_name,
+      COALESCE(p.price, ci.product_price) AS product_price,
+      p.images AS product_images,
+      p.thumbnail AS product_thumbnail
+    FROM cart_items ci
+    LEFT JOIN products p ON ci.source = 'local' AND ci.product_id = p.id
+  `;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Database error occurred" });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// DELETE — remove a single item from the cart by cart row id
+app.delete('/api/cart/items/:id', (req, res) => {
+  const sql = 'DELETE FROM cart_items WHERE id = ?';
+  db.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      console.error('DELETE error:', err.sqlMessage || err.message);
+      return res.status(500).json({ error: err.sqlMessage || "Failed to remove cart item" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Cart item not found" });
+    }
+    res.status(200).json({ message: "Item removed from cart" });
+  });
+});
+
 app.listen(5000, '127.0.0.1', () => {
   console.log('Backend server running on http://127.0.0.1:5000');
 });
